@@ -26,26 +26,6 @@ set(CERES_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/../dependency/ceres/include)
 set(face_pose_include_directories ${face_pose_include_directories} ${CERES_INCLUDE_DIRS})
 set(face_pose_link_libraries ${face_pose_link_libraries} ${CMAKE_CURRENT_LIST_DIR}/../dependency/ceres ${CERES_LIBRARIES})
 
-# 添加 PCL 依赖
-find_package(PCL EXACT REQUIRED)
-set(face_pose_include_directories ${face_pose_include_directories} ${PCL_INCLUDE_DIRS})
-set(face_pose_link_libraries ${face_pose_link_libraries} ${PCL_LIBRARIES})
-
-# 添加 kd tree 依赖
-set(face_pose_include_directories ${face_pose_include_directories} ${CMAKE_CURRENT_LIST_DIR}/../dependency)
-set(face_pose_include_directories ${face_pose_include_directories} ${CMAKE_CURRENT_LIST_DIR}/../dependency/ikd-Tree)
-
-# 添加 Pangolin 依赖
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(Pangolin REQUIRED)
-set(face_pose_include_directories ${face_pose_include_directories} ${Pangolin_INCLUDE_DIRS})
-set(face_pose_link_libraries ${face_pose_link_libraries} ${Pangolin_LIBRARIES})
-
-# 查找TBB库
-find_package(TBB REQUIRED)
-set(face_pose_link_libraries ${face_pose_link_libraries} TBB::tbb)
-
 # catkin_package()
 if(ROS)
     message(STATUS "ROS is found")

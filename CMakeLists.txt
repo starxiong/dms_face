@@ -31,9 +31,6 @@ else ()
     set(CONFIGURATION ${CMAKE_BUILD_TYPE})
 endif ()
 
-include_directories(${Pangolin_INCLUDE_DIRS})
-link_directories(${Pangolin_LIBRARY_DIRS})
-
 INCLUDE(cmake/load_packages.cmake)
 INCLUDE(cmake/source.cmake)
 INCLUDE(cmake/build.cmake)
