@@ -1,5 +1,6 @@
 #include "common.h"
 #include <opencv2/core/eigen.hpp>
+#include <opencv2/viz.hpp>
 
 FACEPOSE_BEGIN
 
@@ -11,6 +12,17 @@ public:
     K_ = K;
     D_ = D;
   };
+
+  inline void SetInitVal(bool is_calibrate, bool is_reconstruct) {
+    is_calibrate_ = is_calibrate;
+    is_reconstruct_ = is_reconstruct;
+  }
+
+  inline void SetFrontalPose(Mat3D &R, Vec3D &t) {
+    frontal_R_ = R;
+    frontal_t_ = t;
+  }
+
   inline void SetDetectKeyPoints(std::vector<Vec2D> &fixed_point2D,
                                  std::vector<Vec2D> &moving_point2D) {
     fixed_point2D_ = fixed_point2D;
@@ -34,7 +46,11 @@ public:
     cv_t_ = t;
   };
 
+  inline void SetNumber(int number) { number_ = number; };
+
+public:
   void Display(cv::Mat &img);
+  void DisplayFace3D();
 
 private:
   void DistortTransform(Mat3D &R, Vec3D &t, std::vector<Vec3D> &in,
@@ -42,9 +58,16 @@ private:
   void Draw3DCoordinateSystem(cv::Mat &image, const Vec3D &world_origin,
                               double axis_length, const Mat3D &R,
                               const Vec3D &t);
-  void DrawAlignedPoints(cv::Mat &img, std::vector<Vec3D> &point1, std::vector<Vec3D> &point2);
+  void DrawAlignedPoints(cv::Mat &img, cv::Mat &img2,
+                         std::vector<Vec3D> &point1,
+                         std::vector<Vec3D> &point2);
   void DrawAlignedPoints(cv::Mat &img, Mat3D &R, Vec3D &t);
-  float CalculateError(std::vector<Vec2D>p1, std::vector<Vec2D> p2);
+  void DrawFrontalVec(cv::Mat &img, Mat3D &R, double reverse = 1);
+  float CalculateError(std::vector<Vec2D> p1, std::vector<Vec2D> p2);
+
+private:
+  bool is_calibrate_{false};
+  bool is_reconstruct_{false};
 
 private:
   Mat3D K_;
@@ -54,6 +77,9 @@ private:
   Mat3D cv_R_;
   Vec3D cv_t_;
   int frame_id_{1};
+  int number_{1};
+  Mat3D frontal_R_;
+  Vec3D frontal_t_;
 
 private:
   std::vector<Vec2D> fixed_point2D_;

@@ -116,4 +116,13 @@ struct RGB {
   unsigned char b;
 };
 
+struct CalibrationResult {
+  Quat q;
+  Vec3D t;
+  double confidence;
+  std::vector<bool> inliners;
+  int num_inliers;
+  CalibrationResult() : confidence(0.0), num_inliers(0) {}
+};
+
 FACEPOSE_END

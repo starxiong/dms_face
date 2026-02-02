@@ -16,7 +16,7 @@ set(face_pose_third_libraries ${face_pose_include_directories} gflags glog)
 set(EIGEN3_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/../dependency/eigen3)
 
 # 添加 Opencv 依赖
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS)
 set(face_pose_include_directories ${face_pose_include_directories} ${OpenCV_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 set(face_pose_third_libraries ${face_pose_third_libraries} ${OpenCV_LIBS} yaml-cpp libpthread.so)
 
