@@ -76,7 +76,6 @@ int PoseEstimation::Init(std::string param_path) {
   std::vector<double> lip_dn3 =
       fs["moving_point"]["lip_dn3"].as<std::vector<double>>();
 
-
   K_ = Mat3D(K_vec.data()).transpose();
   D_ = Vec5D(D_vec.data());
   init_R_ = Mat3D(R_vec.data()).transpose();
@@ -201,53 +200,57 @@ int PoseEstimation::Init(std::string param_path) {
 
   return 0;
 }
-void PoseEstimation::ParseFace2D(std::vector<Point2D> &points) {
-  fixed_point2D_[0] = Vec2D(points[0].x, points[0].y);
-  fixed_point2D_[1] = Vec2D(points[2].x, points[2].y);
-
-  fixed_point2D_[2] = Vec2D(points[3].x, points[3].y);
-  fixed_point2D_[3] = Vec2D(points[5].x, points[5].y);
-
-  fixed_point2D_[4] = Vec2D(points[6].x, points[6].y);
-  fixed_point2D_[5] = Vec2D(points[9].x, points[9].y);
-
-  fixed_point2D_[6] = Vec2D(points[12].x, points[12].y);
-  fixed_point2D_[7] = Vec2D(points[15].x, points[15].y);
-
+void PoseEstimation::ParseFace2D(std::vector<Point2D>& points) {
+  // 左眉
+  fixed_point2D_[0] = Vec2D(points[5].x, points[5].y);
+  fixed_point2D_[1] = Vec2D(points[3].x, points[3].y);
+  // 右眉
+  fixed_point2D_[2] = Vec2D(points[2].x, points[2].y);
+  fixed_point2D_[3] = Vec2D(points[0].x, points[0].y);
+  // 左眼
+  fixed_point2D_[4] = Vec2D(points[15].x, points[15].y);
+  fixed_point2D_[5] = Vec2D(points[12].x, points[12].y);
+  // 右眼
+  fixed_point2D_[6] = Vec2D(points[9].x, points[9].y);
+  fixed_point2D_[7] = Vec2D(points[6].x, points[6].y);
+  // 鼻子
   fixed_point2D_[8] = Vec2D(points[18].x, points[18].y);
   fixed_point2D_[9] = Vec2D(points[19].x, points[19].y);
 
-  fixed_point2D_[10] = Vec2D(points[20].x, points[20].y);
+  fixed_point2D_[10] = Vec2D(points[22].x, points[22].y);
   fixed_point2D_[11] = Vec2D(points[21].x, points[21].y);
-  fixed_point2D_[12] = Vec2D(points[22].x, points[22].y);
+  fixed_point2D_[12] = Vec2D(points[20].x, points[20].y);
+  // 嘴巴
+  fixed_point2D_[13] = Vec2D(points[27].x, points[27].y);
+  fixed_point2D_[14] = Vec2D(points[23].x, points[23].y);
 
-  fixed_point2D_[13] = Vec2D(points[23].x, points[23].y);
-  fixed_point2D_[14] = Vec2D(points[27].x, points[27].y);
-
-  moving_point2D_[0] = Vec2D(points[1].x, points[1].y);
-  moving_point2D_[1] = Vec2D(points[4].x, points[4].y);
-
-  moving_point2D_[2] = Vec2D(points[7].x, points[7].y);
-  moving_point2D_[3] = Vec2D(points[8].x, points[8].y);
-  moving_point2D_[4] = Vec2D(points[10].x, points[10].y);
-  moving_point2D_[5] = Vec2D(points[11].x, points[11].y);
-
-  moving_point2D_[6] = Vec2D(points[13].x, points[13].y);
-  moving_point2D_[7] = Vec2D(points[14].x, points[14].y);
-  moving_point2D_[8] = Vec2D(points[16].x, points[16].y);
-  moving_point2D_[9] = Vec2D(points[17].x, points[17].y);
-
-  moving_point2D_[10] = Vec2D(points[24].x, points[24].y);
+  // 左眉
+  moving_point2D_[0] = Vec2D(points[4].x, points[4].y);
+  // 右眉
+  moving_point2D_[1] = Vec2D(points[1].x, points[1].y);
+  // 左眼
+  moving_point2D_[2] = Vec2D(points[14].x, points[14].y);
+  moving_point2D_[3] = Vec2D(points[13].x, points[13].y);
+  moving_point2D_[4] = Vec2D(points[16].x, points[16].y);
+  moving_point2D_[5] = Vec2D(points[17].x, points[17].y);
+  // 右眼
+  moving_point2D_[6] = Vec2D(points[8].x, points[8].y);
+  moving_point2D_[7] = Vec2D(points[7].x, points[7].y);
+  moving_point2D_[8] = Vec2D(points[10].x, points[10].y);
+  moving_point2D_[9] = Vec2D(points[11].x, points[11].y);
+  // 嘴唇上
+  moving_point2D_[10] = Vec2D(points[26].x, points[26].y);
   moving_point2D_[11] = Vec2D(points[25].x, points[25].y);
-  moving_point2D_[12] = Vec2D(points[26].x, points[26].y);
-
+  moving_point2D_[12] = Vec2D(points[24].x, points[24].y);
+  // 嘴唇下
   moving_point2D_[13] = Vec2D(points[28].x, points[28].y);
   moving_point2D_[14] = Vec2D(points[29].x, points[29].y);
   moving_point2D_[15] = Vec2D(points[30].x, points[30].y);
+  // 下颚
   moving_point2D_[16] = Vec2D(points[31].x, points[31].y);
 }
 
-void PoseEstimation::CVPnpSolver(Mat3D &R, Vec3D &t) {
+void PoseEstimation::CVPnpSolver(Mat3D& R, Vec3D& t) {
   std::vector<cv::Point3f> cvpoint3d;
   std::vector<cv::Point2f> cvpoint2d;
   for (int i = 0; i < fixed_points_ori_.size(); i++) {
@@ -268,14 +271,46 @@ void PoseEstimation::CVPnpSolver(Mat3D &R, Vec3D &t) {
   cv::eigen2cv(K_, K);
   cv::Mat distortion = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
   cv::solvePnP(cvpoint3d, cvpoint2d, K, distortion, rot_vec, trans);
-  Mat3D Ri;
-  Vec3D ti;
+
+  // if (trans.at<double>(2, 0) > 0.) {
+  //   std::vector<double> euler_angles;
+  //   cv::Mat c_m, r_m, t_v, r_mx, r_my, r_mz, mat, r_mat, rR;
+  //   cv::Rodrigues(rot_vec, r_mat);
+  //   std::vector<cv::Mat> matrices = {r_mat, trans};
+  //   cv::hconcat(matrices, mat);
+  //   cv::decomposeProjectionMatrix(mat, c_m, r_m, t_v, r_mx, r_my, r_mz,
+  //                                 euler_angles);
+  //   trans.at<double>(2, 0) = -trans.at<double>(2, 0);
+  //   euler_angles[2] = double(int(euler_angles[2] + 180.) % 360) / 180. * M_PI;
+  //   cv::Mat R_X = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0,
+  //                  std::cos(euler_angles[0]), -std::sin(euler_angles[0]), 0,
+  //                  std::sin(euler_angles[0]), std::cos(euler_angles[0]));
+  //   cv::Mat R_Y = (cv::Mat_<double>(3, 3) << std::cos(euler_angles[1]), 0,
+  //                  std::sin(euler_angles[1]), 0, 1, 0,
+  //                  -std::sin(euler_angles[1]), 0, std::cos(euler_angles[1]));
+  //   cv::Mat R_Z = (cv::Mat_<double>(3, 3) << std::cos(euler_angles[2]),
+  //                  -std::sin(euler_angles[2]), 0, std::sin(euler_angles[2]),
+  //                  std::cos(euler_angles[2]), 0, 0, 0, 1);
+  //   rR = R_Z * (R_Y * R_X);
+
+  //   // cv::Mat rR;
+  //   // cv::eigen2cv(init_R_, rR);
+  //   // cv::eigen2cv(init_t_, trans);
+
+  //   cv::Rodrigues(rR, rot_vec);
+
+  //   cv::solvePnPRefineLM(
+  //       cvpoint3d, cvpoint2d, K, distortion, rot_vec, trans,
+  //       cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10,
+  //                        FLT_EPSILON));
+  // }
+
   cv::Rodrigues(rot_vec, rot);
   cv::cv2eigen(rot, R);
   cv::cv2eigen(trans, t);
 }
 
-void PoseEstimation::Display(cv::Mat &img) {
+void PoseEstimation::Display(cv::Mat& img) {
   Mat3D R = Mat3D::Identity();
   Vec3D t = Vec3D(0, 0, 9);
   SolverFace(fixed_points_show_, fixed_point2D_, moving_points_show_,
@@ -305,7 +340,7 @@ float PoseEstimation::CalculateError() {
   return error;
 }
 
-float PoseEstimation::CaculatePoseAmplitude(Mat3D &R, Vec3D &t) {
+float PoseEstimation::CaculatePoseAmplitude(Mat3D& R, Vec3D& t) {
   Mat3D diff_R = frontal_R_.transpose() * R;
   Vec3D diff_t = frontal_R_.transpose() * (t - frontal_t_);
   AxisD axis = AxisD(diff_R);
@@ -314,8 +349,7 @@ float PoseEstimation::CaculatePoseAmplitude(Mat3D &R, Vec3D &t) {
 }
 
 void PoseEstimation::ReconstructFace3D() {
-  if (is_opt_facemodel_)
-    return;
+  if (is_opt_facemodel_) return;
   float angle = CaculatePoseAmplitude(R_, t_);
   if (angle < low_angle_thresh_ && low_angle_num_ < low_angle_num_thresh_) {
     face_fixed2d_.emplace_back(fixed_point2D_);
@@ -345,7 +379,8 @@ void PoseEstimation::ReconstructFace3D() {
     t_list_.emplace_back(t_);
     high_angle_num_++;
   }
-  int num = low_angle_num_thresh_ + media_angle_num_thresh_ + high_angle_num_thresh_;
+  int num =
+      low_angle_num_thresh_ + media_angle_num_thresh_ + high_angle_num_thresh_;
   if (R_list_.size() >= num) {
     is_opt_facemodel_ = true;
     UpdateFaceModel();
@@ -354,15 +389,15 @@ void PoseEstimation::ReconstructFace3D() {
     std::copy(moving_points_.begin(), moving_points_.end(),
               moving_point.begin());
     for (int i = 0; i < calibrate_R_list_.size(); i++) {
-      auto &R = calibrate_R_list_[i];
-      auto &t = calibrate_t_list_[i];
+      auto& R = calibrate_R_list_[i];
+      auto& t = calibrate_t_list_[i];
       auto fp2d = calibrate_face_fixed2d_[i];
       auto mp2d = calibrate_face_moving2d_[i];
       SolverFace(fixed_points_, fp2d, moving_point, mp2d, R, t);
     }
     CalibrateFrontedFace();
     visual_.SetJointOptimization(fixed_points_, moving_points_, R_, t_);
-    // visual_.DisplayFace3D();
+    visual_.DisplayFace3D();
 
     calibrate_R_list_.clear();
     calibrate_t_list_.clear();
@@ -381,8 +416,7 @@ void PoseEstimation::ReconstructFace3D() {
 }
 
 void PoseEstimation::CalibrateFrontedFace() {
-  if (is_calibrate_)
-    return;
+  if (is_calibrate_) return;
   if (frame_id_ % calibrate_gap_num_ == 0 &&
       calibrate_R_list_.size() < calibrate_num_) {
     calibrate_R_list_.emplace_back(R_);
@@ -397,11 +431,11 @@ void PoseEstimation::CalibrateFrontedFace() {
     frontal_calibrator_.GetResult(frontal_R_, frontal_t_);
   }
 }
-void PoseEstimation::SolverFace(std::vector<Vec3D> &fixed_point3d,
-                                std::vector<Vec2D> &fixed_point2d,
-                                std::vector<Vec3D> &moving_point3d,
-                                std::vector<Vec2D> &moving_point2d, Mat3D &R,
-                                Vec3D &t) {
+void PoseEstimation::SolverFace(std::vector<Vec3D>& fixed_point3d,
+                                std::vector<Vec2D>& fixed_point2d,
+                                std::vector<Vec3D>& moving_point3d,
+                                std::vector<Vec2D>& moving_point2d, Mat3D& R,
+                                Vec3D& t) {
   Vec3D delta_R = Vec3D::Zero();
   Vec3D delta_t = Vec3D::Zero();
   int mn = moving_point3d.size();
@@ -410,7 +444,7 @@ void PoseEstimation::SolverFace(std::vector<Vec3D> &fixed_point3d,
   for (int i = 0; i < fixed_point3d.size(); i++) {
     auto p2d = fixed_point2d[i];
     auto p3d = fixed_point3d[i];
-    ceres::CostFunction *cost =
+    ceres::CostFunction* cost =
         new ceres::AutoDiffCostFunction<Optimization, 3, 3, 3, 17>(
             new Optimization(p2d, p3d, K_, R, t, false, 0));
     problem.AddResidualBlock(cost, nullptr, delta_R.data(), delta_t.data(),
@@ -420,7 +454,7 @@ void PoseEstimation::SolverFace(std::vector<Vec3D> &fixed_point3d,
     auto p2d = moving_point2d[i];
     auto p3d = moving_point3d[i];
     int id = same_moving_index_[i];
-    ceres::CostFunction *cost =
+    ceres::CostFunction* cost =
         new ceres::AutoDiffCostFunction<Optimization, 3, 3, 3, 17>(
             new Optimization(p2d, p3d, K_, R, t, is_init_pose_, id));
     problem.AddResidualBlock(cost, nullptr, delta_R.data(), delta_t.data(),
@@ -428,6 +462,7 @@ void PoseEstimation::SolverFace(std::vector<Vec3D> &fixed_point3d,
   }
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_QR;
+  options.logging_type = ceres::SILENT;
   options.minimizer_progress_to_stdout = false;
   options.max_num_iterations = 200;
   options.num_threads = 4;
@@ -450,6 +485,8 @@ void PoseEstimation::SolverFace(std::vector<Vec3D> &fixed_point3d,
   }
   R = deltaR * R;
   t = deltaR * t + delta_t;
+  Quat q = Eigen::Quaterniond(R);
+  R = q.normalized().toRotationMatrix();
   for (int i = 0; i < moving_delta.size(); i++) {
     // moving_point3d[i](1) += moving_delta[i];
     if (same_moving_index_[i] != i) {
@@ -475,7 +512,7 @@ void PoseEstimation::SolverFaceModel() {
       int symmetry = symmetry_fixed_index_[j];
       int is_sym = symmetry == j ? 0 : 1;
       std::vector<int> opt_dim = point_opt_fixed_dim_[j];
-      ceres::CostFunction *cost =
+      ceres::CostFunction* cost =
           new ceres::AutoDiffCostFunction<FaceModelOptimization, 2, 3>(
               new FaceModelOptimization(p2d, p3d, K_, R, t, is_sym, opt_dim));
       problem.AddResidualBlock(cost, nullptr, fix_delta[symmetry].data());
@@ -486,7 +523,7 @@ void PoseEstimation::SolverFaceModel() {
       int symmetry = symmetry_moving_index_[j];
       int is_sym = symmetry == j ? 0 : 1;
       std::vector<int> opt_dim = point_opt_moving_dim_[j];
-      ceres::CostFunction *cost =
+      ceres::CostFunction* cost =
           new ceres::AutoDiffCostFunction<FaceModelOptimization, 2, 3>(
               new FaceModelOptimization(p2d, p3d, K_, R, t, is_sym, opt_dim));
       problem.AddResidualBlock(cost, nullptr, move_delta[symmetry].data());
@@ -495,6 +532,7 @@ void PoseEstimation::SolverFaceModel() {
 
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_QR;
+  options.logging_type = ceres::SILENT;
   options.minimizer_progress_to_stdout = false;
   options.max_num_iterations = 200;
   options.num_threads = 4;
@@ -538,12 +576,12 @@ void PoseEstimation::UpdateFaceModel() {
   SolverFaceModel();
   for (int i = 0; i < 2; i++) {
     for (int i = 0; i < face_fixed2d_.size(); i++) {
-      auto &R = R_list_[i];
-      auto &t = t_list_[i];
+      auto& R = R_list_[i];
+      auto& t = t_list_[i];
       auto fp2d = face_fixed2d_[i];
       auto fp3d = model_fixed3d_[i];
       auto mp2d = face_moving2d_[i];
-      auto &mp3d = model_moving3d_[i];
+      auto& mp3d = model_moving3d_[i];
       SolverFace(fp3d, fp2d, mp3d, mp2d, R, t);
     }
     SolverFaceModel();
@@ -558,7 +596,7 @@ void PoseEstimation::UpdateFaceModel() {
   model_moving3d_.clear();
 }
 
-int PoseEstimation::Process(std::vector<Point2D> &face_points) {
+int PoseEstimation::Process(std::vector<Point2D>& face_points) {
   ParseFace2D(face_points);
   if (!is_init_pose_) {
     SolverFace(fixed_points_, fixed_point2D_, moving_points_, moving_point2D_,
@@ -606,7 +644,7 @@ void PoseEstimation::Reset() {
   moving_delta_ = std::vector<double>(moving_delta_.size(), 0.0);
 }
 
-void PoseEstimation::GetPose(Mat3D &R, Vec3D &t) {
+void PoseEstimation::GetPose(Mat3D& R, Vec3D& t) {
   R = R_;
   t = t_;
 }

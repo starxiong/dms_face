@@ -98,19 +98,17 @@ class Optimization {
       residuals[1] = (po(1)) / po(2) - target(1);
     }
 
-    // Eigen::Matrix<T, 3, 1> face_normal_local(T(0), T(0), T(-1));
-    // Eigen::Matrix<T, 3, 1> face_normal_world = Rd * face_normal_local;
-    // Eigen::Matrix<T, 3, 1> face_position = Rd * source + dt;
-    // Eigen::Matrix<T, 3, 1> view_direction = -face_position; 
-    // T dot_product = face_normal_world.dot(view_direction.normalized());
-    // T threshold = T(0.2);  
-    // if (dot_product < threshold) {
-    //   residuals[2] = T(10.0) * (threshold - dot_product); 
-    // } else {
-    //   residuals[2] = T(0);
-    // }
+    Eigen::Matrix<T, 3, 1> face_normal_local(T(0), T(0), T(-1));
+    Eigen::Matrix<T, 3, 1> face_position = Rd * source + dt;
+    T dot_product = face_normal_local.dot(face_position.normalized());
+    T threshold = T(0.);  
+    if (dot_product > threshold) {
+      residuals[2] = T(1000.0) * (dot_product - threshold); 
+    } else {
+      residuals[2] = T(0);
+    }
 
-    residuals[2] = T(0);
+    // residuals[2] = T(0);
 
     return true;
   }

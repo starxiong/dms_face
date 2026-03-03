@@ -2,8 +2,8 @@
 
 FACEPOSE_BEGIN
 
-void Visualization::DistortTransform(Mat3D &R, Vec3D &t, std::vector<Vec3D> &in,
-                                     std::vector<Vec2D> &out) {
+void Visualization::DistortTransform(Mat3D& R, Vec3D& t, std::vector<Vec3D>& in,
+                                     std::vector<Vec2D>& out) {
   double k1 = D_(0);
   double k2 = D_(1);
   double p1 = D_(2);
@@ -23,10 +23,10 @@ void Visualization::DistortTransform(Mat3D &R, Vec3D &t, std::vector<Vec3D> &in,
   }
 }
 
-void Visualization::Draw3DCoordinateSystem(cv::Mat &image,
-                                           const Vec3D &world_origin,
-                                           double axis_length, const Mat3D &R,
-                                           const Vec3D &t) {
+void Visualization::Draw3DCoordinateSystem(cv::Mat& image,
+                                           const Vec3D& world_origin,
+                                           double axis_length, const Mat3D& R,
+                                           const Vec3D& t) {
   // 1. 定义世界坐标系中的3D点（X左，Z外，Y上）
   std::vector<cv::Point3f> world_points_3d;
 
@@ -36,13 +36,13 @@ void Visualization::Draw3DCoordinateSystem(cv::Mat &image,
                      static_cast<float>(world_origin(2)));
 
   // 根据坐标系定义：X左，Z外，Y上
-  world_points_3d.push_back(origin); // 原点
+  world_points_3d.push_back(origin);  // 原点
+  world_points_3d.push_back(
+      origin + cv::Point3f(-axis_length, 0, 0));  // X轴末端（向左）
   world_points_3d.push_back(origin +
-                            cv::Point3f(-axis_length, 0, 0)); // X轴末端（向左）
-  world_points_3d.push_back(origin +
-                            cv::Point3f(0, axis_length, 0)); // Y轴末端（向上）
-  world_points_3d.push_back(origin +
-                            cv::Point3f(0, 0, -axis_length)); // Z轴末端（向外）
+                            cv::Point3f(0, axis_length, 0));  // Y轴末端（向上）
+  world_points_3d.push_back(
+      origin + cv::Point3f(0, 0, -axis_length));  // Z轴末端（向外）
   // 2. 转换为OpenCV格式
   cv::Mat cv_K, cv_D, cv_R, cv_t;
   cv::eigen2cv(K_, cv_K);
@@ -53,17 +53,17 @@ void Visualization::Draw3DCoordinateSystem(cv::Mat &image,
   std::vector<cv::Point2f> image_points;
   // projectPoints需要旋转向量而不是旋转矩阵
   cv::Mat rvec;
-  cv::Rodrigues(cv_R, rvec); // 旋转矩阵 -> 旋转向量
+  cv::Rodrigues(cv_R, rvec);  // 旋转矩阵 -> 旋转向量
   // 执行投影
   cv::projectPoints(world_points_3d, rvec, cv_t, cv_K, cv_D, image_points);
   // 5. 绘制坐标轴
   cv::Scalar colors[] = {
-      cv::Scalar(0, 0, 255),    // 红色 - X轴（左）
-      cv::Scalar(0, 255, 0),    // 绿色 - Y轴（上）
-      cv::Scalar(255, 0, 0),    // 蓝色 - Z轴（外）
-      cv::Scalar(255, 255, 255) // 白色 - 原点
+      cv::Scalar(0, 0, 255),     // 红色 - X轴（左）
+      cv::Scalar(0, 255, 0),     // 绿色 - Y轴（上）
+      cv::Scalar(255, 0, 0),     // 蓝色 - Z轴（外）
+      cv::Scalar(255, 255, 255)  // 白色 - 原点
   };
-  const char *labels[] = {"X", "Y", "Z", "O"};
+  const char* labels[] = {"X", "Y", "Z", "O"};
   // 绘制三个轴
   for (int i = 1; i <= 3; ++i) {
     cv::Point2f p1 = image_points[0];
@@ -81,21 +81,21 @@ void Visualization::Draw3DCoordinateSystem(cv::Mat &image,
       cv::Point label_pos;
       // 根据轴方向调整标签位置
       switch (i) {
-      case 1: // X轴（左）
-        cv::arrowedLine(image, p1, p2, colors[i - 1], 2, cv::LINE_AA, 0, 0.1);
-        label_pos =
-            cv::Point(static_cast<int>(p2.x - 25), static_cast<int>(p2.y));
-        break;
-      case 2: // Y轴（上）
-        cv::arrowedLine(image, p1, p2, colors[i - 1], 1, cv::LINE_AA, 0, 0.1);
-        label_pos =
-            cv::Point(static_cast<int>(p2.x), static_cast<int>(p2.y - 15));
-        break;
-      case 3: // Z轴（外）
-        cv::arrowedLine(image, p1, p2, colors[i - 1], 2, cv::LINE_AA, 0, 0.1);
-        label_pos =
-            cv::Point(static_cast<int>(p2.x + 5), static_cast<int>(p2.y));
-        break;
+        case 1:  // X轴（左）
+          cv::arrowedLine(image, p1, p2, colors[i - 1], 2, cv::LINE_AA, 0, 0.1);
+          label_pos =
+              cv::Point(static_cast<int>(p2.x - 25), static_cast<int>(p2.y));
+          break;
+        case 2:  // Y轴（上）
+          cv::arrowedLine(image, p1, p2, colors[i - 1], 1, cv::LINE_AA, 0, 0.1);
+          label_pos =
+              cv::Point(static_cast<int>(p2.x), static_cast<int>(p2.y - 15));
+          break;
+        case 3:  // Z轴（外）
+          cv::arrowedLine(image, p1, p2, colors[i - 1], 2, cv::LINE_AA, 0, 0.1);
+          label_pos =
+              cv::Point(static_cast<int>(p2.x + 5), static_cast<int>(p2.y));
+          break;
       }
       cv::putText(image, label, label_pos, cv::FONT_HERSHEY_SIMPLEX, 0.2,
                   colors[i - 1], 1);
@@ -103,9 +103,9 @@ void Visualization::Draw3DCoordinateSystem(cv::Mat &image,
   }
 }
 
-void Visualization::DrawAlignedPoints(cv::Mat &img, cv::Mat &img2,
-                                      std::vector<Vec3D> &point1,
-                                      std::vector<Vec3D> &point2) {
+void Visualization::DrawAlignedPoints(cv::Mat& img, cv::Mat& img2,
+                                      std::vector<Vec3D>& point1,
+                                      std::vector<Vec3D>& point2) {
   int width = 300, height = 300;
   std::vector<Vec2D> point2d;
   Mat3D R = Mat3D::Identity();
@@ -178,7 +178,7 @@ void Visualization::DrawAlignedPoints(cv::Mat &img, cv::Mat &img2,
   small_img2.copyTo(roi);
 }
 
-void Visualization::DrawFrontalVec(cv::Mat &img, Mat3D &R, double reverse) {
+void Visualization::DrawFrontalVec(cv::Mat& img, Mat3D& R, double reverse) {
   int w = 140, h = 150;
   double L = std::min(w / 2.5, h / 2.5);
   std::vector<Vec2D> point2d;
@@ -186,22 +186,22 @@ void Visualization::DrawFrontalVec(cv::Mat &img, Mat3D &R, double reverse) {
   cv::Mat small_img2(h, w, CV_8UC3, cv::Scalar(0, 0, 0));
   Vec3D p = Vec3D(0, 0, L);
 
-  Vec3D p1 = R * p;
+  Vec3D p1 = R.transpose() * p;
   cv::Point p0_ = cv::Point(w / 2, h / 2);
   cv::Point p1_ = cv::Point(p1(0), p1(2)) + p0_;
-  if (reverse < 0)
-    p1_ = cv::Point(-p1(0), p1(2)) + p0_;
+  if (reverse < 0) p1_ = cv::Point(-p1(0), p1(2)) + p0_;
 
   cv::arrowedLine(small_img, p0_, p1_, cv::Scalar(255, 255, 255), 2,
                   cv::LINE_AA, 0, 0.1);
   p1_ = cv::Point(p1(2), p1(1)) + p0_;
-  if (reverse < 0)
-    p1_ = cv::Point(p1(2), -p1(1)) + p0_;
+  if (reverse < 0) p1_ = cv::Point(p1(2), -p1(1)) + p0_;
   cv::arrowedLine(small_img2, p0_, p1_, cv::Scalar(255, 255, 255), 2,
                   cv::LINE_AA, 0, 0.1);
 
   cv::Mat roi =
       img(cv::Rect(2 * h - w + 70, 40 + 300, small_img.cols, small_img.rows));
+  cv::flip(small_img, small_img, 1);
+  cv::flip(small_img2, small_img2, 1);
   small_img.copyTo(roi);
   roi = img(cv::Rect(70, 40 + 300, small_img2.cols, small_img2.rows));
   small_img2.copyTo(roi);
@@ -291,7 +291,7 @@ void Visualization::DisplayFace3D() {
   window.spin();
 }
 
-void Visualization::Display(cv::Mat &img) {
+void Visualization::Display(cv::Mat& img) {
   cv::Mat img2 = img.clone();
   std::vector<Vec2D> fixed_show, fixed_show2;
   std::vector<Vec2D> moving_show, moving_show2;
@@ -329,17 +329,56 @@ void Visualization::Display(cv::Mat &img) {
 
   Vec3D coor_chin = fixed_point3D_opt_[13] + fixed_point3D_opt_[14];
   coor_chin[1] = coor_chin[1] / 2.0 - 0.55, coor_chin[2] = coor_chin[2] / 2.0;
+  // Mat3D opt_R = opt_R_.transpose() * frontal_R_;
+  // Vec3D opt_t = opt_R_.transpose() * (frontal_t_ - opt_t_);
+  // Mat3D cv_R = cv_R_.transpose() * frontal_R_;
+  // Vec3D cv_t = cv_R_.transpose() * (frontal_t_ - cv_t_);
+  Mat3D opt_R = frontal_R_.transpose() * opt_R_;
+  Vec3D opt_t = frontal_R_.transpose() * (frontal_t_ - opt_t_);
+  Mat3D cv_R = frontal_R_.transpose() * cv_R_;
+  Vec3D cv_t = frontal_R_.transpose() * (frontal_t_ - cv_t_);
 
-  Mat3D opt_R = opt_R_ * frontal_R_.transpose();
-  Vec3D opt_t = opt_t_ - opt_R_ * frontal_R_.transpose() * frontal_t_;
-  Mat3D cv_R = cv_R_ * frontal_R_.transpose();
-  Vec3D cv_t = cv_t_ - cv_R_ * frontal_R_.transpose() * frontal_t_;
+  Quat q = Eigen::Quaterniond(opt_R);
+  opt_R = q.normalized().toRotationMatrix();
+  q = Eigen::Quaterniond(cv_R);
+  cv_R = q.normalized().toRotationMatrix();
 
   Draw3DCoordinateSystem(img, coor_chin, 0.5, opt_R_, opt_t_);
   Draw3DCoordinateSystem(img2, coor_chin, 0.5, cv_R_, cv_t_);
 
-  Vec3D euler1 = opt_R.eulerAngles(2, 1, 0) * 180 / 3.1415926; // ZYX顺序
-  Vec3D euler2 = cv_R.eulerAngles(2, 1, 0) * 180 / 3.1415926;  // ZYX顺序
+  cv::Mat r_mat, trans_vec;
+  cv::Mat r_mat2, trans_vec2;
+  cv::eigen2cv(opt_R, r_mat);
+  cv::eigen2cv(cv_R, r_mat2);
+  cv::eigen2cv(opt_t, trans_vec);
+  cv::eigen2cv(cv_t, trans_vec2);
+  std::vector<cv::Mat> matrices = {r_mat, trans_vec};
+  std::vector<cv::Mat> matrices2 = {r_mat2, trans_vec2};
+  cv::Mat pose_mat, pose_mat2;
+  cv::hconcat(matrices, pose_mat);
+  cv::hconcat(matrices2, pose_mat2);
+  cv::Mat c_m, r_m, t_v, r_mx, r_my, r_mz;
+  std::vector<double> euler_angles, euler_angles2;
+  cv::decomposeProjectionMatrix(pose_mat, c_m, r_m, t_v, r_mx, r_my, r_mz,
+                                euler_angles);
+
+  cv::decomposeProjectionMatrix(pose_mat2, c_m, r_m, t_v, r_mx, r_my, r_mz,
+                                euler_angles2);
+
+  Vec3D euler1 = opt_R.eulerAngles(0, 1, 2) * 180 / 3.1415926;  // XYZ顺序
+  Vec3D euler2 = cv_R.eulerAngles(0, 1, 2) * 180 / 3.1415926;   // XYZ顺序
+
+  euler1 << euler_angles[0], euler_angles[1], euler_angles[2];
+  euler2 << euler_angles2[0], euler_angles2[1], euler_angles2[2];
+
+  Vec3D p0 = Vec3D(0, 0, 1);
+  Vec3D p1 = opt_R * p0;
+  Vec3D p2 = cv_R * p0;
+  double yaw1 = std::atan(p1(0) / p1(2)) * 180 / 3.1415926;
+  double yaw2 = std::atan(p2(0) / p2(2)) * 180 / 3.1415926;
+  double pitch1 = std::atan(-p1(1) / std::sqrt(p1(0) * p1(0) + p1(2) * p1(2))) * 180 / 3.1415926;
+  double pitch2 = std::atan(-p2(1) / std::sqrt(p2(0) * p2(0) + p2(2) * p2(2))) * 180 / 3.1415926;
+
   std::string euler_str1 = "opt_R: " + std::to_string(euler1[0]) + ", " +
                            std::to_string(euler1[1]) + ", " +
                            std::to_string(euler1[2]);
@@ -363,6 +402,10 @@ void Visualization::Display(cv::Mat &img) {
   cv::putText(img, "reprojection error: " + std::to_string(opt_error),
               cv::Point(400, 145), cv::FONT_HERSHEY_SIMPLEX, 0.8,
               cv::Scalar(255, 255, 255), 2);
+  cv::putText(
+      img, "yaw-pitch: " + std::to_string(yaw1) + ", " + std::to_string(pitch1),
+      cv::Point(400, 180), cv::FONT_HERSHEY_SIMPLEX, 0.8,
+      cv::Scalar(255, 255, 255), 2);
   cv::putText(img, "frame_id : " + std::to_string(frame_id_),
               cv::Point(1000, 80), cv::FONT_HERSHEY_SIMPLEX, 0.8,
               cv::Scalar(255, 255, 255), 2);
@@ -390,9 +433,15 @@ void Visualization::Display(cv::Mat &img) {
               cv::Point(400, 145), cv::FONT_HERSHEY_SIMPLEX, 0.8,
               cv::Scalar(255, 255, 255), 2);
 
+  cv::putText(
+      img2,
+      "yaw-pitch: " + std::to_string(yaw2) + ", " + std::to_string(pitch2),
+      cv::Point(400, 180), cv::FONT_HERSHEY_SIMPLEX, 0.8,
+      cv::Scalar(255, 255, 255), 2);
+
   DrawAlignedPoints(img, img2, fixed_point3D_, moving_point3D_opt_);
   DrawFrontalVec(img, opt_R);
-  DrawFrontalVec(img2, cv_R, -1);
+  DrawFrontalVec(img2, cv_R);
 
   cv::Mat join_mat = cv::Mat::zeros(img.rows * 2, img.cols, img.type());
   cv::Mat roi = join_mat(cv::Rect(0, 0, img.cols, img.rows));
@@ -408,6 +457,8 @@ void Visualization::Display(cv::Mat &img) {
   cv::namedWindow("optimization", cv::WINDOW_NORMAL);
   cv::imshow("optimization", join_mat);
   cv::waitKey(1);
+
+  std::cout << "frame_id_: " << frame_id_ << std::endl;
 
   frame_id_++;
 }
