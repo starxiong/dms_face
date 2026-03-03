@@ -245,12 +245,12 @@ void Visualization::DisplayFace3D() {
 
   std::vector<cv::Point3f> left_eye_up = {fixed_points[4], moving_points[2],
                                           moving_points[3], fixed_points[5]};
-  std::vector<cv::Point3f> left_eye_dn = {fixed_points[4], moving_points[5],
-                                          moving_points[4], fixed_points[5]};
+  std::vector<cv::Point3f> left_eye_dn = {fixed_points[4], moving_points[4],
+                                          moving_points[5], fixed_points[5]};
   std::vector<cv::Point3f> right_eye_up = {fixed_points[6], moving_points[6],
                                            moving_points[7], fixed_points[7]};
-  std::vector<cv::Point3f> right_eye_dn = {fixed_points[6], moving_points[9],
-                                           moving_points[8], fixed_points[7]};
+  std::vector<cv::Point3f> right_eye_dn = {fixed_points[6], moving_points[8],
+                                           moving_points[9], fixed_points[7]};
 
   std::vector<cv::Point3f> noseup = {fixed_points[8], fixed_points[9]};
   std::vector<cv::Point3f> nosedn = {fixed_points[10], fixed_points[11],
@@ -258,8 +258,8 @@ void Visualization::DisplayFace3D() {
   std::vector<cv::Point3f> lip_up = {fixed_points[13], moving_points[10],
                                      moving_points[11], moving_points[12],
                                      fixed_points[14]};
-  std::vector<cv::Point3f> lip_dn = {fixed_points[13], moving_points[15],
-                                     moving_points[14], moving_points[13],
+  std::vector<cv::Point3f> lip_dn = {fixed_points[13], moving_points[14],
+                                     moving_points[13], moving_points[15],
                                      fixed_points[14]};
 
   cv::viz::WPolyLine left_eyebrow_line(left_eyebrow, cv::viz::Color::blue());
