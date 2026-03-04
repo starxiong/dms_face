@@ -334,9 +334,9 @@ void Visualization::Display(cv::Mat& img) {
   // Mat3D cv_R = cv_R_.transpose() * frontal_R_;
   // Vec3D cv_t = cv_R_.transpose() * (frontal_t_ - cv_t_);
   Mat3D opt_R = frontal_R_.transpose() * opt_R_;
-  Vec3D opt_t = frontal_R_.transpose() * (frontal_t_ - opt_t_);
+  Vec3D opt_t = frontal_R_.transpose() * (opt_t_ - frontal_t_);
   Mat3D cv_R = frontal_R_.transpose() * cv_R_;
-  Vec3D cv_t = frontal_R_.transpose() * (frontal_t_ - cv_t_);
+  Vec3D cv_t = frontal_R_.transpose() * (cv_t_ - frontal_t_);
 
   Quat q = Eigen::Quaterniond(opt_R);
   opt_R = q.normalized().toRotationMatrix();
